@@ -1,0 +1,464 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CampusClash API Testing Dashboard</title>
+    <style>
+      :root {
+        --bg-body: #f3f4f6;
+        --bg-card: #ffffff;
+        --text-main: #111827;
+        --text-muted: #6b7280;
+        --border-color: #e5e7eb;
+        --primary: #3b82f6;
+        --primary-hover: #2563eb;
+        --success: #10b981;
+        --success-bg: #89e1c4;
+        --post-color: #10b981;
+        --get-color: #3b82f6;
+        --put-color: #f59e0b;
+        --delete-color: #ef4444;
+      }
+
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
+          Arial, sans-serif;
+        background-color: var(--bg-body);
+        color: var(--text-main);
+        margin: 0;
+        padding: 20px;
+      }
+
+      h1,
+      h2,
+      h3 {
+        text-align: center;
+        color: var(--text-main);
+      }
+
+      .config-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        padding: 20px;
+        margin: 0 auto 40px auto;
+        max-width: 1000px;
+        display: flex;
+        gap: 20px;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .config-group {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-grow: 1;
+      }
+
+      .config-group label {
+        font-weight: 600;
+        white-space: nowrap;
+      }
+
+      .config-group input {
+        flex-grow: 1;
+        padding: 8px 12px;
+        border: 1px solid var(--border-color);
+        border-radius: 4px;
+        font-size: 14px;
+      }
+
+      .section-title {
+        max-width: 1200px;
+        margin: 0 auto 20px auto;
+        border-bottom: 2px solid #d1d5db;
+        padding-bottom: 10px;
+        font-size: 24px;
+        font-weight: bold;
+      }
+
+      .api-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+        gap: 20px;
+        max-width: 1200px;
+        margin: 0 auto 40px auto;
+      }
+
+      .api-card {
+        background: var(--bg-card);
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        border-top: 4px solid var(--primary);
+      }
+
+      .api-card.post {
+        border-top-color: var(--post-color);
+      }
+      .api-card.get {
+        border-top-color: var(--get-color);
+      }
+      .api-card.put {
+        border-top-color: var(--put-color);
+      }
+      .api-card.delete {
+        border-top-color: var(--delete-color);
+      }
+
+      .api-header {
+        padding: 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 1px solid var(--border-color);
+      }
+
+      .api-title {
+        font-weight: bold;
+        font-size: 16px;
+      }
+
+      .badge {
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: bold;
+        color: white;
+      }
+
+      .badge.post {
+        background-color: var(--post-color);
+      }
+      .badge.get {
+        background-color: var(--get-color);
+      }
+      .badge.put {
+        background-color: var(--put-color);
+      }
+      .badge.delete {
+        background-color: var(--delete-color);
+      }
+
+      .api-body {
+        padding: 15px;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        flex-grow: 1;
+      }
+
+      .endpoint-url {
+        background: #f1f5f9;
+        padding: 8px 12px;
+        border-radius: 4px;
+        font-family: monospace;
+        font-size: 13px;
+        word-break: break-all;
+      }
+
+      textarea {
+        width: 100%;
+        height: 120px;
+        padding: 10px;
+        border: 1px solid var(--border-color);
+        border-radius: 4px;
+        font-family: monospace;
+        font-size: 13px;
+        resize: vertical;
+        box-sizing: border-box;
+      }
+
+      .btn {
+        background: #374151;
+        color: white;
+        border: none;
+        padding: 10px;
+        border-radius: 4px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: background 0.2s;
+        width: 100%;
+      }
+
+      .btn:hover {
+        background: #1f2937;
+      }
+
+      .response-box {
+        background: #1f2937;
+        color: #10b981;
+        padding: 15px;
+        border-radius: 4px;
+        font-family: monospace;
+        font-size: 13px;
+        min-height: 80px;
+        max-height: 250px;
+        overflow-y: auto;
+        white-space: pre-wrap;
+        word-wrap: break-word;
+        margin-top: auto;
+      }
+      .response-box.error {
+        color: #ef4444;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>CampusClash API Testing Dashboard</h1>
+
+    <div class="config-card">
+      <div class="config-group">
+        <label>Global Config</label>
+      </div>
+      <div class="config-group">
+        <label>Server URL:</label>
+        <input
+          type="text"
+          id="baseUrl"
+          value="https://campusclash-server-production.up.railway.app"
+        />
+      </div>
+      <div class="config-group">
+        <label>JWT Token:</label>
+        <input
+          type="text"
+          id="globalToken"
+          placeholder="Paste token here to auto-fill"
+        />
+      </div>
+    </div>
+
+    <!-- USERS API -->
+    <h2 class="section-title">Users & Auth APIs</h2>
+    <div class="api-grid">
+      <!-- Register/Create User -->
+      <div class="api-card post">
+        <div class="api-header">
+          <span class="api-title">Register User</span>
+          <span class="badge post">POST</span>
+        </div>
+        <div class="api-body">
+          <div class="endpoint-url">
+            /users (or your exact register route)
+          </div>
+          <textarea id="payload-registerUser">
+{
+  "college_name": "MIT",
+  "full_name": "John Doe",
+  "mobile_number": "1234567890",
+  "is_host": false
+}</textarea
+          >
+          <button
+            class="btn"
+            onclick="
+              sendReq(
+                'POST',
+                '/users',
+                'payload-registerUser',
+                'res-registerUser',
+              )
+            "
+          >
+            Send Request
+          </button>
+          <div id="res-registerUser" class="response-box">
+            Response will appear here...
+          </div>
+        </div>
+      </div>
+
+      <!-- Get All Users -->
+      <div class="api-card get">
+        <div class="api-header">
+          <span class="api-title">Get All Users</span>
+          <span class="badge get">GET</span>
+        </div>
+        <div class="api-body">
+          <div class="endpoint-url">/users</div>
+          <button
+            class="btn"
+            onclick="sendReq('GET', '/users', null, 'res-getUsers')"
+          >
+            Send Request
+          </button>
+          <div id="res-getUsers" class="response-box">
+            Response will appear here...
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TOURNAMENTS API -->
+    <h2 class="section-title">Tournaments APIs</h2>
+    <div class="api-grid">
+      <!-- Create Inter-Campus -->
+      <div class="api-card post">
+        <div class="api-header">
+          <span class="api-title">Create Inter-Campus</span>
+          <span class="badge post">POST</span>
+        </div>
+        <div class="api-body">
+          <div class="endpoint-url">/tournaments/inter</div>
+          <textarea id="payload-inter">
+{
+  "tournament_name": "Summer Clash 2026",
+  "prize_pool": 5000.00,
+  "date": "2026-06-15",
+  "colleges": ["MIT", "Harvard"],
+  "g_form": "http://forms.gle/xyz",
+  "game": "Valorant",
+  "description": "Annual esports fest.",
+  "organizers": ["John", "Alice"]
+}</textarea
+          >
+          <button
+            class="btn"
+            onclick="
+              sendReq(
+                'POST',
+                '/tournaments/inter',
+                'payload-inter',
+                'res-inter',
+              )
+            "
+          >
+            Send Request
+          </button>
+          <div id="res-inter" class="response-box">
+            Response will appear here...
+          </div>
+        </div>
+      </div>
+
+      <!-- Get Inter-Campus -->
+      <div class="api-card get">
+        <div class="api-header">
+          <span class="api-title">Get Inter-Campus Tournaments</span>
+          <span class="badge get">GET</span>
+        </div>
+        <div class="api-body">
+          <div class="endpoint-url">/tournaments/inter</div>
+          <button
+            class="btn"
+            onclick="
+              sendReq('GET', '/tournaments/inter', null, 'res-getinter')
+            "
+          >
+            Send Request
+          </button>
+          <div id="res-getinter" class="response-box">
+            Response will appear here...
+          </div>
+        </div>
+      </div>
+
+      <!-- Create Intra-Campus -->
+      <div class="api-card post">
+        <div class="api-header">
+          <span class="api-title">Create Intra-Campus</span>
+          <span class="badge post">POST</span>
+        </div>
+        <div class="api-body">
+          <div class="endpoint-url">/tournaments/intra</div>
+          <textarea id="payload-intra">
+{
+  "tournament_name": "Hostel Wars",
+  "prize_pool": 1000.00,
+  "date": "2026-07-10"
+}</textarea
+          >
+          <button
+            class="btn"
+            onclick="
+              sendReq(
+                'POST',
+                '/tournaments/intra',
+                'payload-intra',
+                'res-intra',
+              )
+            "
+          >
+            Send Request
+          </button>
+          <div id="res-intra" class="response-box">
+            Response will appear here...
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      async function sendReq(method, endpoint, payloadId, responseId) {
+        const baseUrl = document
+          .getElementById("baseUrl")
+          .value.replace(/\/$/, "");
+        const token = document.getElementById("globalToken").value;
+        const responseBox = document.getElementById(responseId);
+
+        responseBox.innerText = "Loading...";
+        responseBox.classList.remove("error");
+
+        const headers = {
+          "Content-Type": "application/json",
+        };
+        if (token) {
+          headers["Authorization"] = `Bearer ${token}`; // or whatever format you use
+        }
+
+        let body = null;
+        if (payloadId) {
+          try {
+            const rawVal = document.getElementById(payloadId).value;
+            if (rawVal.trim() !== "") {
+              body = document.getElementById(payloadId).value;
+              JSON.parse(body); // Validate JSON
+            }
+          } catch (e) {
+            responseBox.innerText =
+              "Invalid JSON in Request Body:\n" + e.message;
+            responseBox.classList.add("error");
+            return;
+          }
+        }
+
+        try {
+          const options = { method, headers };
+          if (method !== "GET" && method !== "HEAD" && body) {
+            options.body = body;
+          }
+
+          // If your backend routes don't match exactly /users, adjust the URLs in the HTML 'endpoint-url' and the 'endpoint' param of the onclick functions.
+          const res = await fetch(baseUrl + endpoint, options);
+          let data;
+          const contentType = res.headers.get("content-type");
+
+          if (contentType && contentType.includes("application/json")) {
+            data = await res.json();
+          } else {
+            data = await res.text();
+          }
+
+          if (!res.ok) {
+            responseBox.classList.add("error");
+          }
+
+          if (typeof data === "object") {
+            responseBox.innerText = JSON.stringify(data, null, 2);
+          } else {
+            responseBox.innerText = data;
+          }
+        } catch (err) {
+          responseBox.classList.add("error");
+          responseBox.innerText = "Network Error:\n" + err.message;
+        }
+      }
+    </script>
+  </body>
+</html>
