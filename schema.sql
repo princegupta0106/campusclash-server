@@ -1,5 +1,4 @@
-CREATE DATABASE IF NOT EXISTS tournament_db;
-USE tournament_db;
+USE railway;
 
 CREATE TABLE IF NOT EXISTS users (
   id INT AUTO_INCREMENT PRIMARY KEY,
